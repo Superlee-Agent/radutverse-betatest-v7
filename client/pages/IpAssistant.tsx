@@ -203,18 +203,6 @@ const IpAssistant = () => {
     }
   }, []);
 
-  // Sync wallet state to AuthContext
-  useEffect(() => {
-    if (authContext) {
-      authContext.setAuthenticated(authenticated);
-      if (authenticated && primaryWalletAddress) {
-        authContext.setWalletAddress(primaryWalletAddress);
-      } else if (!authenticated) {
-        authContext.setWalletAddress(null);
-      }
-    }
-  }, [authenticated, primaryWalletAddress, authContext]);
-
   useEffect(() => {
     if (autoScrollNextRef.current) {
       // use throttled scroll helper instead of raw timeouts
@@ -378,6 +366,18 @@ const IpAssistant = () => {
     }
     return user?.wallet?.address ?? null;
   }, [wallets, user?.wallet?.address]);
+
+  // Sync wallet state to AuthContext
+  useEffect(() => {
+    if (authContext) {
+      authContext.setAuthenticated(authenticated);
+      if (authenticated && primaryWalletAddress) {
+        authContext.setWalletAddress(primaryWalletAddress);
+      } else if (!authenticated) {
+        authContext.setWalletAddress(null);
+      }
+    }
+  }, [authenticated, primaryWalletAddress, authContext]);
 
   useEffect(() => {
     try {
