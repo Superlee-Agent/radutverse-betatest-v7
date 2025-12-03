@@ -10,6 +10,7 @@ import IpImagineInput from "@/components/ip/imagine/Input";
 import ChatHeaderActions from "@/components/ip/assistant/ChatHeaderActions";
 import SidebarExtras from "@/components/ip/assistant/SidebarExtras";
 import { CreationContext, Creation } from "@/context/CreationContext";
+import { AuthContext } from "@/context/AuthContext";
 import * as openaiService from "@/services/openaiService";
 import { generateDemoImage } from "@/lib/utils/generate-demo-image";
 
