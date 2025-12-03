@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { useNavigate } from "react-router-dom";
 
+import { AuthContext } from "@/context/AuthContext";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import ChatHeaderActions from "@/components/ip/assistant/ChatHeaderActions";
 import SidebarExtras from "@/components/ip/assistant/SidebarExtras";
@@ -202,6 +203,18 @@ const IpAssistant = () => {
     }
   }, []);
 
+  // Sync wallet state to AuthContext
+  useEffect(() => {
+    if (authContext) {
+      authContext.setAuthenticated(authenticated);
+      if (authenticated && primaryWalletAddress) {
+        authContext.setWalletAddress(primaryWalletAddress);
+      } else if (!authenticated) {
+        authContext.setWalletAddress(null);
+      }
+    }
+  }, [authenticated, primaryWalletAddress, authContext]);
+
   useEffect(() => {
     if (autoScrollNextRef.current) {
       // use throttled scroll helper instead of raw timeouts
@@ -233,7 +246,9 @@ const IpAssistant = () => {
   const [loadingRegisterFor, setLoadingRegisterFor] = useState<string | null>(
     null,
   );
-  const [guestMode, setGuestMode] = useState<boolean>(false);
+  const authContext = useContext(AuthContext);
+  const guestMode = authContext?.guestMode ?? false;
+  const setGuestMode = authContext?.setGuestMode ?? (() => {});
   const [toolsOpen, setToolsOpen] = useState<boolean>(false);
   const [previewImages, setPreviewImages] = useState<PreviewImagesState>({
     remixImage: null,
@@ -452,10 +467,12 @@ const IpAssistant = () => {
     if (!ready) return;
     if (authenticated) {
       logout();
+      authContext?.setAuthenticated(false);
+      authContext?.setWalletAddress(null);
     } else {
       void login({ loginMethods: ["wallet"] });
     }
-  }, [ready, authenticated, login, logout]);
+  }, [ready, authenticated, login, logout, authContext]);
 
   const walletButtonText = authenticated
     ? "Disconnect"
