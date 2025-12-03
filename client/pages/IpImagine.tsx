@@ -134,6 +134,21 @@ const IpImagine = () => {
     context.setUserIdentifier(walletAddress, guestMode);
   }, [authenticated, wallets, guestMode, context]);
 
+  // Sync wallet state to AuthContext
+  useEffect(() => {
+    if (authContext) {
+      authContext.setAuthenticated(authenticated);
+      if (authenticated && wallets && wallets.length > 0) {
+        const walletWithAddress = wallets.find((wallet) => wallet.address);
+        if (walletWithAddress?.address) {
+          authContext.setWalletAddress(walletWithAddress.address);
+        }
+      } else if (!authenticated) {
+        authContext.setWalletAddress(null);
+      }
+    }
+  }, [authenticated, wallets, authContext]);
+
   const handleImage = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
       try {
