@@ -8,6 +8,7 @@ import React, {
 import { AnimatePresence, motion } from "framer-motion";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { AuthContext } from "@/context/AuthContext";
 import ChatHeaderActions from "@/components/ip/assistant/ChatHeaderActions";
 import SidebarExtras from "@/components/ip/assistant/SidebarExtras";
 import IpImagineInput from "@/components/ip/imagine/Input";
@@ -26,8 +27,9 @@ import { CreationContext } from "@/context/CreationContext";
 
 const IpImagine = () => {
   const context = useContext(CreationContext);
+  const authContext = useContext(AuthContext);
   const creations = context?.creations || [];
-  const guestMode = context?.guestMode || false;
+  const guestMode = authContext?.guestMode ?? false;
   const { authenticated } = usePrivy();
   const { wallets } = useWallets();
 
@@ -37,7 +39,6 @@ const IpImagine = () => {
     resultUrl,
     setResultUrl,
     setResultType,
-    setGuestMode,
   } = useGeminiGenerator();
 
   const [input, setInput] = useState("");
@@ -416,7 +417,7 @@ const IpImagine = () => {
   // This ensures watermark is applied before image is stored in creation history
 
   const handleToggleGuest = async () => {
-    setGuestMode(!guestMode);
+    authContext?.setGuestMode(!guestMode);
     // Refresh guest creations when toggling
     if (!guestMode && context?.refreshGuestCreations) {
       await context.refreshGuestCreations();
