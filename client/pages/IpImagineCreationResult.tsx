@@ -10,12 +10,14 @@ import IpImagineInput from "@/components/ip/imagine/Input";
 import ChatHeaderActions from "@/components/ip/assistant/ChatHeaderActions";
 import SidebarExtras from "@/components/ip/assistant/SidebarExtras";
 import { CreationContext, Creation } from "@/context/CreationContext";
+import { AuthContext } from "@/context/AuthContext";
 import * as openaiService from "@/services/openaiService";
 import { generateDemoImage } from "@/lib/utils/generate-demo-image";
 
 const IpImagineCreationResult = () => {
   const navigate = useNavigate();
   const context = useContext(CreationContext);
+  const authContext = useContext(AuthContext);
   const { authenticated } = usePrivy();
   const { wallets } = useWallets();
 
@@ -56,10 +58,10 @@ const IpImagineCreationResult = () => {
     loadingMessage,
     error,
     originalPrompt,
-    guestMode,
-    setGuestMode,
     updateCreationWithOriginalUrl,
   } = context;
+
+  const guestMode = authContext?.guestMode ?? false;
 
   const [showUpscaler, setShowUpscaler] = useState(false);
   const [upscaledUrl, setUpscaledUrl] = useState<string | null>(null);
@@ -93,6 +95,21 @@ const IpImagineCreationResult = () => {
 
     context.setUserIdentifier(walletAddress, guestMode);
   }, [authenticated, wallets, guestMode, context]);
+
+  // Sync wallet state to AuthContext
+  useEffect(() => {
+    if (authContext) {
+      authContext.setAuthenticated(authenticated);
+      if (authenticated && wallets && wallets.length > 0) {
+        const walletWithAddress = wallets.find((wallet) => wallet.address);
+        if (walletWithAddress?.address) {
+          authContext.setWalletAddress(walletWithAddress.address);
+        }
+      } else if (!authenticated) {
+        authContext.setWalletAddress(null);
+      }
+    }
+  }, [authenticated, wallets, authContext]);
 
   // Refresh guest creations when toggling to guest mode
   useEffect(() => {
@@ -196,7 +213,7 @@ const IpImagineCreationResult = () => {
   };
 
   const handleToggleGuest = () => {
-    setGuestMode(!guestMode);
+    authContext?.setGuestMode(!guestMode);
   };
 
   const headerActions = (
