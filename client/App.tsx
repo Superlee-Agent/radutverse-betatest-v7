@@ -6,6 +6,7 @@ import { PrivyProvider } from "@privy-io/react-auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CreationProvider } from "@/context/CreationContext";
+import { AuthProvider } from "@/context/AuthContext";
 import { RouteLoader } from "@/components/common/RouteLoader";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -127,11 +128,13 @@ const App = () => {
   ensurePrivyAnalyticsFetchPatched();
 
   const appContent = (
-    <CreationProvider>
-      <QueryClientProvider client={queryClient}>
-        <AppRoutes />
-      </QueryClientProvider>
-    </CreationProvider>
+    <AuthProvider>
+      <CreationProvider>
+        <QueryClientProvider client={queryClient}>
+          <AppRoutes />
+        </QueryClientProvider>
+      </CreationProvider>
+    </AuthProvider>
   );
 
   if (!privyAppId) {
