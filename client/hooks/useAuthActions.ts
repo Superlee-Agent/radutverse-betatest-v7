@@ -50,7 +50,9 @@ export const useAuthActions = () => {
 
   // Connected address label
   const connectedAddressLabel = useMemo(() => {
-    return authenticated && walletAddress ? truncateAddress(walletAddress) : null;
+    return authenticated && walletAddress
+      ? truncateAddress(walletAddress)
+      : null;
   }, [authenticated, walletAddress]);
 
   return {

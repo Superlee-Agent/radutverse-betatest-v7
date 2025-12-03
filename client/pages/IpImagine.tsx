@@ -33,13 +33,8 @@ const IpImagine = () => {
   const { authenticated } = usePrivy();
   const { wallets } = useWallets();
 
-  const {
-    generate,
-    isLoading,
-    resultUrl,
-    setResultUrl,
-    setResultType,
-  } = useGeminiGenerator();
+  const { generate, isLoading, resultUrl, setResultUrl, setResultType } =
+    useGeminiGenerator();
 
   const [input, setInput] = useState("");
   const [waiting, setWaiting] = useState(false);
